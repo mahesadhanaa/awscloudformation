@@ -6,50 +6,30 @@ Parameters:
         Type: "AWS::EC2::KeyPair::KeyName"
         ConstraintDescription: "mhs-ec2-instance"
 Resources:
-    InstanceSecurityGroup:
-        Type: "AWS::EC2::SecurityGroup"
-        Properties:
-            Tags:
-                -
-                    Key: "purpose"
-                    Value: "CloudFormationTesting"
-            VpcId: "vpc-02466d3ef00e58f31"
-            GroupDescription: "Enable SSH access via port 22"
-            SecurityGroupIngress:
-                -
-                    CidrIp: "0.0.0.0/0"
-                    Description: "Allowed from anywhere"
-                    FromPort: "22"
-                    ToPort: "22"
-                    IpProtocol: "tcp"
     EC2Instance:
         Type: "AWS::EC2::Instance"
         Properties:
             ImageId: "ami-077a5b1762a2dde35"
             InstanceType: "t2.micro"
-            SecurityGroupIds:
-                -
-                    !GetAtt InstanceSecurityGroup.GroupId
+            SecurityGroups: "sg-07bf27ca4b30fdee0"
+            KeyName: !Ref KeyName
+            VpcId: "vpc-035bd206feb45b6ef"
+            SubnetId: "subnet-0e619498e81bb0871"
+            AssociatePublicIpAddress: "true"
             Tags:
                 -
                     Key: "purpose"
                     Value: "CloudFormationTesting"
-            NetworkInterfaces: 
-                - AssociatePublicIpAddress: "true"
-                  DeleteOnTermination: "true"
-                  DeviceIndex: "0"
-                  GroupSet: 
-                  - Ref: "sg-07464f7f59ea0ff91"
-                  SubnetId: 
-                  - Ref: "subnet-0d2afaa1377eb6a04"
-            UserData:
-                Fn::Base64:
-                    !Sub |
-                    #!/bin/bash -xe
-                    rm -rf /var/lib/cloud/*
-                    sudo apt-get update
-                    sudo apt-get install git
-                    git clone https://github.com/mahesadhanaa/shell-script.git
-                    cd shell-script
-                    sudo chmod +x install-apache2.sh
-                    sudo ./install-apache2.sh
+            # UserData: 
+            # #!/bin/bash
+            # rm -rf /var/lib/cloud/*
+            # sudo apt-get update
+            # sudo apt-get install git
+            # git clone https://github.com/mahesadhanaa/shell-script.git
+            # cd shell-script
+            # sudo chmod +x install-apache2.sh
+            # sudo ./install-apache2.sh
+Outputs:
+    FirstEC2InstanceId:
+        Description: "Instance Id of first EC2 Instance"
+        Value: !Ref EC2Instance

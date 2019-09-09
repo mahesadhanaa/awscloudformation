@@ -29,7 +29,7 @@ Metadata:
     ParameterGroups:
       -
         Label:
-          default: "Worker Network Configuration"
+          default: "Network Configuration"
         Parameters:
           - VpcBlock
           - Subnet01Block

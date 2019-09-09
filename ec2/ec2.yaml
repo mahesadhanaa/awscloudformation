@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Creates two Subnets, a DBSubnetGroup, an EC2 instance and a RDS instance.
+Parameters:
+    KeyName:
+        Description: "Name of an existing EC2 KeyPair to enable SSH access to the instance"
+        Type: "AWS::EC2::KeyPair::KeyName"
+        ConstraintDescription: "mhs-ec2-instance"
+    SG:
+        Description: Security Group
+        Type: String
+        Default: "sg-07bf27ca4b30fdee0"    
+Resources:
+    EC2Instance:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-06f2f779464715dc5"
+            InstanceType: "t2.micro"
+            NetworkInterfaces:
+              - AssociatePublicIpAddress: "true"
+                DeviceIndex: '0'
+                DeleteOnTermination: 'true'
+                GroupSet: 
+                  - Ref: SG
+                SubnetId: "subnet-0e619498e81bb0871"
+            Tags:
+                -
+                    Key: "Name"
+                    Value: "mhs-sp2-testing"
+            UserData:
+              Fn::Base64: 
+                #!/bin/bash
+                rm -rf /var/lib/cloud/*
+                sudo apt-get update
+                sudo apt-get install git
+                git clone https://github.com/mahesadhanaa/shell-script.git
+                cd shell-script
+                sudo chmod +x install-apache2.sh
+                sudo ./install-apache2.sh
+Outputs:
+    FirstEC2InstanceId:
+        Description: "Instance Id of first EC2 Instance"
+        Value: !Ref EC2Instance
